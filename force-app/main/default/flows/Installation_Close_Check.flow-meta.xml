@@ -3,6 +3,17 @@
     <apiVersion>64.0</apiVersion>
     <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <customErrors>
+        <description>Could not retrieve handover items</description>
+        <name>Could_not_retrieve_handover_items</name>
+        <label>Could not retrieve handover items</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <customErrorMessages>
+            <errorMessage>Could not retrieve handover items</errorMessage>
+            <isFieldError>false</isFieldError>
+        </customErrorMessages>
+    </customErrors>
+    <customErrors>
         <description>Refuses to close an installation that was never given an install date.</description>
         <name>Install_Date_Missing</name>
         <label>Install Date Missing</label>
@@ -13,12 +24,49 @@
             <isFieldError>false</isFieldError>
         </customErrorMessages>
     </customErrors>
+    <customErrors>
+        <description>A handover item not done was found</description>
+        <name>Record_not_done_found</name>
+        <label>Record not done found</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <customErrorMessages>
+            <errorMessage>A handover item not done was found
+{!Handover_Items.CreatedById}</errorMessage>
+            <isFieldError>false</isFieldError>
+        </customErrorMessages>
+    </customErrors>
+    <decisions>
+        <name>Decision_2</name>
+        <label>Decision 2</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Record_not_done_found</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>A record with is done to false</defaultConnectorLabel>
+        <rules>
+            <name>No_records_found</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Handover_Items.Id</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <label>No records found</label>
+        </rules>
+    </decisions>
     <decisions>
         <description>Was the installation ever given an install date?</description>
         <name>No_Install_Date</name>
         <label>No Install Date</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Handover_Items</targetReference>
+        </defaultConnector>
         <defaultConnectorLabel>Install date set</defaultConnectorLabel>
         <rules>
             <name>Date_Missing</name>
@@ -53,6 +101,31 @@
         </value>
     </processMetadataValues>
     <processType>AutoLaunchedFlow</processType>
+    <recordLookups>
+        <description>Obtatins handover item with is done false</description>
+        <name>Handover_Items</name>
+        <label>Handover Items</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Decision_2</targetReference>
+        </connector>
+        <faultConnector>
+            <targetReference>Could_not_retrieve_handover_items</targetReference>
+        </faultConnector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Is_Done__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <booleanValue>false</booleanValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Handover_Item__c</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
     <start>
         <locationX>0</locationX>
         <locationY>0</locationY>
